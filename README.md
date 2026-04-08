@@ -7,3 +7,5 @@ This mod basically in short spawn prop_dynamic npc with brains, it currently hav
 The NPC have 4 classes: Non-armed (normal), Armed, Projectile Armed and Melee armed, they also react to survivors and infected.
 
 You are can edit this script and use it but please give me a credit!
+
+Be aware, this code have some logic errors and glitches in-game, the current major bug is Melee npcs somehow can go pass through walls when chasing a target. hopefully I could fix that soon.
