@@ -2161,10 +2161,13 @@ class ::PedArmed extends Pedestrian //uses weaponfire based weapons like pistol,
     npcWeaponName = null;
     npcWeaponFireEntity = null; //if npc has pistol, shotgun, riffle or sniper riffle we gonna use this and assign env_weaponfire to it.
     npcIsAiming = false;
+    npcCanMoveDuringAim = false;
+    npcAimMoveDirection = "N";
+    npcAimNextRandomMove = 2.0;
     npcMyCurrentEnemy = null;
     npcCombatTime = 4.0;
     
-    constructor(npcorigin, thehealth, themodel, gender, voiceSet, type, affiliation, aggression, canTaunt, bodyGroup, bodySkin, range, weapon)
+    constructor(npcorigin, thehealth, themodel, gender, voiceSet, type, affiliation, aggression, canTaunt, bodyGroup, bodySkin, range, weapon, canMoveDuringAim = 0)
     {
         ::FIREARMNPC_COUNT++
         base.constructor(npcorigin, thehealth, themodel, gender, voiceSet, type, affiliation, aggression, canTaunt, bodyGroup, bodySkin, range);
@@ -2175,6 +2178,11 @@ class ::PedArmed extends Pedestrian //uses weaponfire based weapons like pistol,
         local wpSkin = 0;
         local wfType = 0;
         local wfDamageMod = 1.0;
+
+        if(canMoveDuringAim == 1)
+        {
+            this.npcCanMoveDuringAim = true;
+        }
 
         switch(weapon)
         {
@@ -2279,6 +2287,116 @@ class ::PedArmed extends Pedestrian //uses weaponfire based weapons like pistol,
         }
     }
 
+    function AimMove(direction, _moveDist = 5, _checkDistance = 20)
+    {
+        if (this.npcMyCurrentEnemy == null) return false;
+
+        local myPos = this.npcModel.GetOrigin();
+        local forward = this.npcModel.GetForwardVector();
+        local right = Vector(forward.y, -forward.x, 0);
+        
+        local moveVec = Vector(0,0,0);
+        local anim = "pistolaim_move"; //fallback anim.
+
+        switch(this.npcWeapon)
+        {
+            case 1: anim = "pistolaim_move"; break;
+            case 2: anim = "shotgunaim_move"; break;
+            case 3: anim = "rifleaim_move"; break;
+            case 4: anim = "sniperrifleaim_move"; break;
+            case 5: anim = "grenadelauncheraim_move"; break;
+            case 6: anim = "molotovaim_move"; break;
+            case 7: anim = "rocketlauncheraim_move"; break;
+            case 8: anim = "rocketlauncheraim_move"; break;
+        }
+
+        switch(direction)
+        {
+            case "N":  moveVec = forward; break;                  // Forward
+            case "S":  moveVec = forward * -1; break;             // Backward
+            case "W":  moveVec = right * -1; break;               // Left
+            case "E":  moveVec = right; break;                    // Right
+            case "NW": moveVec = (forward - right); break;        // Forward-Left
+            case "NE": moveVec = (forward + right); break;        // Forward-Right
+            case "SW": moveVec = (forward * -1 - right); break;   // Back-Left
+            case "SE": moveVec = (forward * -1 + right); break;   // Back-Right
+        }
+
+        if (moveVec.x == 0 && moveVec.y == 0 && moveVec.z == 0)
+        {
+            moveVec = forward; 
+        }
+
+        //doing this instead of .Norm() because it fucking destroys the whole script.
+        local len = sqrt((moveVec.x * moveVec.x) + (moveVec.y * moveVec.y) + (moveVec.z * moveVec.z));
+        if (len > 0)
+        {
+            moveVec = Vector(moveVec.x / len, moveVec.y / len, moveVec.z / len);
+        }
+
+        local targetMoveCheck = myPos + (moveVec * _checkDistance);
+        local targetMovePos = myPos + (moveVec * _moveDist)
+
+        local enemy = this.npcMyCurrentEnemy; 
+
+        /*
+        if (enemy != null && enemy.IsValid() && enemy.GetHealth() > 0)
+        {
+            TurnToTarget(enemy);
+        }
+        else 
+        {
+            this.npcIsAiming = false;
+            this.npcMyCurrentEnemy = null;
+        }  
+        */
+
+        local tr = {
+            start = myPos + Vector(0,0,32),
+            end = targetMoveCheck + Vector(0,0,32),
+            mask = playerClip | monsterClip | moveableClip | defaultClip,
+            ignore = this.npcHitbox
+        };
+
+        if (this.npcCurrentAnimation != anim && !this.npcBusy)
+        {
+            SetAnimationWithDefault(anim);
+            this.npcCurrentAnimation = anim;
+        }
+
+        //this.npcIsStandingStill = false;
+
+        TraceLine(tr);
+
+        if (!tr.hit)
+        {
+            local tr2 = 
+            {
+            start = targetMovePos + Vector(0,0,32),
+            end = targetMovePos + Vector(0,0,-64),
+            mask = playerClip | monsterClip | moveableClip | defaultClip,
+            ignore = this.npcHitbox
+            }
+            TraceLine(tr2)
+
+            if(tr2.hit)
+            {
+                if (abs(myPos.z - tr2.pos.z) < 64) 
+                {
+                    this.npcModel.SetOrigin(tr2.pos);
+                    return true;
+                }
+            }
+            else
+            {
+                this.npcModel.SetOrigin(tr2.pos - Vector(0, 0, -3));
+                return false;
+            }
+        }
+        
+        return false;
+    }
+
     function AimAt(target)
     {
         this.npcMyCurrentEnemy = target;
@@ -2287,7 +2405,23 @@ class ::PedArmed extends Pedestrian //uses weaponfire based weapons like pistol,
             TurnToTarget(target); 
         }
 
-        if (!this.npcCurrentlyAnimated)
+        if(this.npcCanMoveDuringAim)
+        {
+            if (this.npcAimNextRandomMove <= 0)
+            {
+                local directions = ["N", "S", "W", "E", "NW", "NE", "SW", "SE"];
+                this.npcAimMoveDirection = directions[RandomInt(0, 7)];
+                this.npcAimNextRandomMove = RandomFloat(1.5, 6.0);
+            }
+            else 
+            {
+                this.npcAimNextRandomMove -= this.npcThinkTime;
+            }
+
+            AimMove(this.npcAimMoveDirection);
+        }
+
+        if (!this.npcCurrentlyAnimated && !this.npcCanMoveDuringAim)
         {
             switch(this.npcWeapon)
             {
@@ -2598,10 +2732,10 @@ class ::PedProjectile extends PedArmed //uses Grenade Launcher or Molotov
     npcProjectileSpawnEntity = null; //if npc has grenade launcher or molotov we gonna use this and assign an info_target to it.
     npcNextProjectileSpawnTime = 4.0;
 
-    constructor(npcorigin, thehealth, themodel, gender, voiceSet, type, affiliation, aggression, canTaunt, bodyGroup, bodySkin, range, weapon)
+    constructor(npcorigin, thehealth, themodel, gender, voiceSet, type, affiliation, aggression, canTaunt, bodyGroup, bodySkin, range, weapon, canMoveDuringAim = 0)
     {
         ::PROJECTILENPC_COUNT++
-        base.constructor(npcorigin, thehealth, themodel, gender, voiceSet, type, affiliation, aggression, canTaunt, bodyGroup, bodySkin, range, weapon);
+        base.constructor(npcorigin, thehealth, themodel, gender, voiceSet, type, affiliation, aggression, canTaunt, bodyGroup, bodySkin, range, weapon, canMoveDuringAim);
         this.npcProjectileSpawnEntity = SpawnEntityFromTable("info_target", {});
         DoEntFire("!self", "SetParent", this.npcModel.GetName(), 0, null, this.npcWeaponModel);
         DoEntFire("!self", "SetParent", this.npcWeaponName, 0, null, this.npcProjectileSpawnEntity);
@@ -4280,7 +4414,7 @@ __CollectGameEventCallbacks(this)
     }
 }
 
-::SpawnNPC <- function(npcClass, spawnPos, health, modelID, gender, voiceID, type, affiliation, aggression, canTaunt, totalBody, skin, npcRange, npcWeapon, dmgMultiplier = 1.0)
+::SpawnNPC <- function(npcClass, spawnPos, health, modelID, gender, voiceID, type, affiliation, aggression, canTaunt, totalBody, skin, npcRange, npcWeapon, dmgMultiplier = 1.0, canMoveAim = 0)
 {
     if(::globalNPCCount >= ::globalNPCLimit) //if we are reached the limit abort it
     {
@@ -4312,7 +4446,7 @@ __CollectGameEventCallbacks(this)
                 printl("[NPC] YOU CANNOT SPAWN PROJECTILE WEAPON IN THIS NPC CLASS");
                 return;
             }
-            newPed = PedArmed(spawnPos, health, maleModels[modelID], gender, maleVoiceSets[voiceID], type, affiliation, aggression, taunt, totalBody, skin, npcRange, npcWeapon);
+            newPed = PedArmed(spawnPos, health, maleModels[modelID], gender, maleVoiceSets[voiceID], type, affiliation, aggression, taunt, totalBody, skin, npcRange, npcWeapon, canMoveAim);
             ent = newPed.npcModel;
             break;
         }
@@ -4323,7 +4457,7 @@ __CollectGameEventCallbacks(this)
                 printl("[NPC] YOU CANNOT SPAWN FIREARM WEAPON IN THIS NPC CLASS");
                 return;
             }
-            newPed = PedProjectile(spawnPos, health, maleModels[modelID], gender, maleVoiceSets[voiceID], type, affiliation, aggression, taunt, totalBody, skin, npcRange, npcWeapon);
+            newPed = PedProjectile(spawnPos, health, maleModels[modelID], gender, maleVoiceSets[voiceID], type, affiliation, aggression, taunt, totalBody, skin, npcRange, npcWeapon, canMoveAim);
             ent = newPed.npcModel;
             break;
         }
@@ -4354,7 +4488,7 @@ __CollectGameEventCallbacks(this)
     AddThinkToEnt(ent, "Think");
 }
 
-::SpawnNPCFromRandomLocation <- function(npcClass, health, modelID, gender, voiceID, type, affiliation, aggression, canTaunt, totalBody, skin, npcRange, npcWeapon, dmgMultiplier = 1.0)
+::SpawnNPCFromRandomLocation <- function(npcClass, health, modelID, gender, voiceID, type, affiliation, aggression, canTaunt, totalBody, skin, npcRange, npcWeapon, dmgMultiplier = 1.0, canMoveAim = 0)
 {
     local point = null;
     local pointList = [];
@@ -4396,7 +4530,7 @@ __CollectGameEventCallbacks(this)
         finalOrigin = testPos;
     }
 
-    SpawnNPC(npcClass, finalOrigin, health, modelID, gender, voiceID, type, affiliation, aggression, canTaunt, totalBody, skin, npcRange, npcWeapon, dmgMultiplier);
+    SpawnNPC(npcClass, finalOrigin, health, modelID, gender, voiceID, type, affiliation, aggression, canTaunt, totalBody, skin, npcRange, npcWeapon, dmgMultiplier, canMoveAim);
 }
 
 function DebugCreatePath()
@@ -4539,17 +4673,17 @@ function OnGameEvent_player_say( params )
                         {
                             case 1:
                             {
-                                SpawnNPCFromRandomLocation(1, RandomInt(50, 100), 1, 0, 0, 0, 1, RandomFloat(0.0, 1.0), 1, -1, RandomInt(0, 3), RandomInt(500, 2000), 1);
+                                SpawnNPCFromRandomLocation(1, RandomInt(50, 100), 1, 0, 0, 0, 1, RandomFloat(0.0, 1.0), 1, -1, RandomInt(0, 3), RandomInt(500, 2000), 1, 1, 1);
                                 break;
                             }
                             case 2:
                             {
-                                SpawnNPCFromRandomLocation(2, RandomInt(50, 100), 1, 0, 0, 0, 1, RandomFloat(0.5, 1.0), 1, -1, RandomInt(0, 3), RandomInt(500, 2000), RandomInt(1, 4));
+                                SpawnNPCFromRandomLocation(2, RandomInt(50, 100), 1, 0, 0, 0, 1, RandomFloat(0.5, 1.0), 1, -1, RandomInt(0, 3), RandomInt(500, 2000), RandomInt(1, 4), 1, 1);
                                 break;
                             }
                             case 3:
                             {
-                                SpawnNPCFromRandomLocation(3, RandomInt(50, 100), 1, 0, 0, 0, 1, RandomFloat(0.6, 1.0), 1, -1, RandomInt(0, 3), RandomInt(500, 2000), RandomInt(5, 7));
+                                SpawnNPCFromRandomLocation(3, RandomInt(50, 100), 1, 0, 0, 0, 1, RandomFloat(0.6, 1.0), 1, -1, RandomInt(0, 3), RandomInt(500, 2000), RandomInt(5, 7), 1, 1);
                                 break;
                             }
                         }
@@ -4569,12 +4703,12 @@ function OnGameEvent_player_say( params )
                         {
                             case 1:
                             {
-                                SpawnNPCFromRandomLocation(2, RandomInt(50, 100), 1, 0, 0, 0, 2, RandomFloat(0.5, 1.0), 1, 94, RandomInt(0, 3), RandomInt(500, 2000), RandomInt(1, 4));
+                                SpawnNPCFromRandomLocation(2, RandomInt(50, 100), 1, 0, 0, 0, 2, RandomFloat(0.5, 1.0), 1, 94, RandomInt(0, 3), RandomInt(500, 2000), RandomInt(1, 4), 1, 1);
                                 break;
                             }
                             case 2:
                             {
-                                SpawnNPCFromRandomLocation(3, RandomInt(50, 100), 1, 0, 0, 0, 2, RandomFloat(0.6, 1.0), 1, 94, RandomInt(0, 3), RandomInt(500, 2000), RandomInt(5, 7));
+                                SpawnNPCFromRandomLocation(3, RandomInt(50, 100), 1, 0, 0, 0, 2, RandomFloat(0.6, 1.0), 1, 94, RandomInt(0, 3), RandomInt(500, 2000), RandomInt(5, 7), 1, 1);
                                 break;
                             }
                         }
@@ -4636,12 +4770,12 @@ function OnGameEvent_player_say( params )
                         {
                             case 1:
                             {
-                                SpawnNPCFromRandomLocation(2, RandomInt(50, 100), 1, 0, 0, 0, 1, 1.0, 1, -1, RandomInt(0, 3), RandomInt(500, 2000), RandomInt(1, 4));
+                                SpawnNPCFromRandomLocation(2, RandomInt(50, 100), 1, 0, 0, 0, 1, 1.0, 1, -1, RandomInt(0, 3), RandomInt(500, 2000), RandomInt(1, 4), 1, 1);
                                 break;
                             }
                             case 2:
                             {
-                                SpawnNPCFromRandomLocation(3, RandomInt(50, 100), 2, 0, 0, 0, 1, 1.0, 1, -2, RandomInt(0, 3), RandomInt(500, 2000), RandomInt(5, 7));
+                                SpawnNPCFromRandomLocation(3, RandomInt(50, 100), 2, 0, 0, 0, 1, 1.0, 1, -2, RandomInt(0, 3), RandomInt(500, 2000), RandomInt(5, 7), 1, 1);
                                 break;
                             }
                         }

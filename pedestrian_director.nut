@@ -293,7 +293,7 @@ function SpawnFromPopulation(_vectorOrigin)
     }
     if (npcData[10] == -1) { skinChoice = RandomInt(0, 3); }
     
-    SpawnNPC(npcData[0], _vectorOrigin, npcData[1], npcData[2], npcData[3], npcData[4], npcData[5], npcData[6], npcData[7], npcData[8], npcData[9], skinChoice, npcData[11], weaponChoice)
+    SpawnNPC(npcData[0], _vectorOrigin, npcData[1], npcData[2], npcData[3], npcData[4], npcData[5], npcData[6], npcData[7], npcData[8], npcData[9], skinChoice, npcData[11], weaponChoice, npcData[13], npcData[14]);
     return true;
 }
 

@@ -16,21 +16,22 @@ npcWeapon: the weapon for the NPC to use, if set to -1 it will be random based o
 WEAPON CHOICES: 1 = PISTOL, 2 = RIFLE, 3 = SHOTGUN, 4 = SNIPER RIFLE, 5 = GRENADE LAUNCHER, 6 = MOLOTOV, 7 = ROCKET LAUNCHER, 8 = MINI NUKE LAUNCHER
 MELEE CHOICES: 0 = FISTS, 1 = BASEBALLBAT, 2 = SWORD, 3 = KATANA, 4 = SHOVEL, 5 = PAN, 6 = SLEDGEHAMMER, 7 = BATON, 8 = AXE, 9 = KNIFE, 10 = SIGN
 damageMultiplier: multiplies the damage of melee
+npcCanMoveDuringAim: 0 = can't move during aiming, 1 = can move during aim (only applies to armed and projectile npcs)
 */
 
 DEFAULT_POPULATION <- //Default Population (if the map doesn't match any of the below)
 [
     [1, 100, 1, 0, 2, 0, 1, 0.5, 1, 0, -1, 1000, -1], //unarmed NPC, the most basic npc ever.
-    [2, 150, 2, 0, 0, 0, 1, 0.8, 1, 94, -1, 1500, 1], //armed police officer, uses pistol
+    [2, 150, 2, 0, 0, 0, 1, 0.8, 1, 94, -1, 1500, 1, 1, 1], //armed police officer, uses pistol
     [5, 100, 2, 0, 0, 0, 1, 1.0, 1, 94, -1, 750, 7, 1.5], //police officer with baton.
-    [2, 120, 1, 0, 0, 0, 1, 0.8, 1, 100, -1, 1500, 2], //armed tourist, uses rifle
-    [3, 200, 1, 0, 2, 0, 1, 1.0, 1, 12, -1, 2200, 7], //soldier, uses rocket launcher
-    [3, 200, 1, 0, 2, 0, 1, 1.0, 1, 12, -1, 2200, 5], //soldier, uses grenade launcher
+    [2, 120, 1, 0, 0, 0, 1, 0.8, 1, 100, -1, 1500, 2, 1, 1], //armed tourist, uses rifle
+    [3, 200, 1, 0, 2, 0, 1, 1.0, 1, 12, -1, 2200, 7, 1, 1], //soldier, uses rocket launcher
+    [3, 200, 1, 0, 2, 0, 1, 1.0, 1, 12, -1, 2200, 5, 1, 1], //soldier, uses grenade launcher
     [5, 85, 1, 0, 2, 0, 1, 0.6, 1, -2, -1, 750, -1, 1.5], //melee npc with random melee (penguin 1)
     [5, 85, 2, 0, 2, 0, 1, 0.6, 1, -2, -1, 750, -1, 1.5], //melee npc with random melee (penguin 2)
-    [2, 150, 1, 0, 0, 0, 1, 0.6, 1, -1, -1, 1500, -1], //armed npc with random weapon (penguin 1)
-    [2, 150, 2, 0, 0, 0, 1, 0.6, 1, -2, -1, 1500, -1], //armed npc with random weapon (penguin 2)
-    [3, 150, 2, 0, 0, 0, 1, 0.8, 1, -2, -1, 1500, -1] //armed npc with random projectile weapon (penguin 2)
+    [2, 150, 1, 0, 0, 0, 1, 0.6, 1, -1, -1, 1500, -1, 1, 1], //armed npc with random weapon (penguin 1)
+    [2, 150, 2, 0, 0, 0, 1, 0.6, 1, -2, -1, 1500, -1, 1, 1], //armed npc with random weapon (penguin 2)
+    [3, 150, 2, 0, 0, 0, 1, 0.8, 1, -2, -1, 1500, -1, 1, 1] //armed npc with random projectile weapon (penguin 2)
 ]
 
 TSP_NPCTEST_POPULATION <- DEFAULT_POPULATION //tsp_npctest population (test map for npcs). just same as default population
