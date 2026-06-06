@@ -1,3 +1,7 @@
+# Version 1.1 Update
+
+- Added "Aim Move" feature: this makes both Armed and Projectile NPCs move while they aiming at enemies. by default "canMoveDuringAim" is set to 0, you must set to 1 to make NPCs move while aiming before spawning.
+
 # L4D2-NPC-VScript-
 The L4D2 VScript mod that I made that adds Dummy NPCs around the map and for my upcoming L4D2 Mod
 
