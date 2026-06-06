@@ -42,6 +42,15 @@ FIGHTFIGHTFIGHT_POPULATION <-
     [5, 85, 1, 0, 2, 0, 1, 0.6, 1, -2, -1, 750, 0, 1.5], //melee npc with fists (penguin 1)
 ]
 
+GUNSONLY_POPULATION <-
+[
+    [2, 150, 2, 0, 0, 0, 1, 0.8, 1, 94, -1, 1500, 1, 1, 1], //armed police officer, uses pistol
+    [2, 120, 1, 0, 0, 0, 1, 0.8, 1, 100, -1, 1500, 2, 1, 1], //armed tourist, uses rifle
+    [3, 200, 1, 0, 2, 0, 1, 1.0, 1, 12, -1, 2200, 7, 1.5], //soldier with rocket launcher
+    [3, 200, 1, 0, 2, 0, 1, 1.0, 1, 12, -1, 2200, 5 ,1.5], //soldier with grenade launcher
+    [2, 150, 2 ,0 ,0 ,0 ,1 ,0.6 ,1 ,-2 ,-1 ,1500 , -1 ,1 ,1] //armed npc with random weapon (penguin)
+]
+
 
 BLOP4DEAD_03_POPULATION <- //Bloopers 4 Dead 3rd map population (Club Penguin)
 [

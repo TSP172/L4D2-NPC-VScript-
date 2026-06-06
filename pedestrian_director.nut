@@ -263,6 +263,8 @@ function SpawnFromPopulation(_vectorOrigin)
 
     local weaponChoice = npcData[12];
     local skinChoice = npcData[10];
+    local damageMulti = 1.0;
+    local canMoveDuringAim = 0;
 
     switch(npcData[0])
     {
@@ -292,8 +294,10 @@ function SpawnFromPopulation(_vectorOrigin)
         else if (npcData[0] == 5) { weaponChoice = RandomInt(0, 10); }
     }
     if (npcData[10] == -1) { skinChoice = RandomInt(0, 3); }
-    
-    SpawnNPC(npcData[0], _vectorOrigin, npcData[1], npcData[2], npcData[3], npcData[4], npcData[5], npcData[6], npcData[7], npcData[8], npcData[9], skinChoice, npcData[11], weaponChoice, npcData[13], npcData[14]);
+    if (npcData.len() > 13 && npcData[13] != null) { damageMulti = npcData[13]; }
+    if (npcData.len() > 14 && npcData[14] != null) { canMoveDuringAim = npcData[14]; }
+
+    SpawnNPC(npcData[0], _vectorOrigin, npcData[1], npcData[2], npcData[3], npcData[4], npcData[5], npcData[6], npcData[7], npcData[8], npcData[9], skinChoice, npcData[11], weaponChoice, damageMulti, canMoveDuringAim);
     return true;
 }
 
@@ -329,7 +333,7 @@ function ChangePopulationMap()
     }
 }
 
-function ChangePopulationByID(id=0)
+function ChangePopulationByID(id=1)
 {
     switch(id)
     {
@@ -337,6 +341,12 @@ function ChangePopulationByID(id=0)
         {
             POPULATION = FIGHTFIGHTFIGHT_POPULATION;
             printl("POPULATION CHANGED: FIGHT FIGHT FIGHT!");
+            break;
+        }
+        case 1:
+        {
+            POPULATION = GUNSONLY_POPULATION;
+            printl("POPULATION CHANGED: GUNS ONLY!");
             break;
         }
         default:
@@ -371,6 +381,20 @@ function DebugShowForbiddenAreas()
             DebugDrawBox(area.GetCenter(), Vector(-20, -20, -20), Vector(20, 20, 20), 255, 0, 0, 255, 10.0);
         }
     }
+}
+
+function DebugShowNPCData()
+{
+    printl("ACTIVE NORMAL NPC COUNT: " + ::NONARMEDNPC_COUNT);
+    printl("ACTIVE ARMED NPC COUNT: " + ::FIREARMNPC_COUNT);
+    printl("ACTIVE PROJECTILE NPC COUNT: " + ::PROJECTILENPC_COUNT);
+    printl("ACTIVE MELEE NPC COUNT: " + ::MELEENPC_COUNT);
+    printl("-----------------------------------------------");
+    printl("Overall NPC Limit: " + MAX_NPCS);
+    printl("Current Normal NPC Limit: " + MAX_NORMAL);
+    printl("Current Armed NPC Limit: " + MAX_ARMED);
+    printl("Current Projectiles NPC Limit: " + MAX_PROJECTILE);
+    printl("Current Melee NPC Limit: " + MAX_MELEE);
 }
 
 ::ChaosMode <- function(toggle, onslaught = 0)
