@@ -52,6 +52,18 @@ GUNSONLY_POPULATION <-
     [2, 150, 2 ,0 ,0 ,0 ,1 ,0.6 ,1 ,-2 ,-1 ,1500 , -1 ,1 ,1] //armed npc with random weapon (penguin)
 ]
 
+BANANAS_POPULATION <-
+[
+    [3, 200, 1, 0, 2, 0, 1, 1.0, 1, -2, -1, 1000, 11, 1.0, 1],
+    [3, 200, 2, 0, 2, 0, 1, 1.0, 1, -2, -1, 1000, 11, 1.0, 1],
+]
+
+GRENADE_POPULATION <-
+[
+    [3, 150, 1, 0, 0, 0, 1, 0.8, 1, -2, -1, 1000, 10, 1, 1],
+    [3, 150, 2, 0, 0, 0, 1, 0.8, 1, -2, -1, 1000, 9, 1, 1],
+    [3, 150, 2, 0, 0, 0, 1, 0.8, 1, -2, -1, 1000, -1, 1, 1]
+]
 
 BLOP4DEAD_03_POPULATION <- //Bloopers 4 Dead 3rd map population (Club Penguin)
 [

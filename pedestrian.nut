@@ -5002,23 +5002,6 @@ function OnGameEvent_player_say( params )
                     }
                     break;
                 }
-                case "GETYOURASSMOVING":
-                {
-                    local ent = null;
-                    while (ent = Entities.FindByClassname(ent, "prop_dynamic"))
-                    {
-                        if (ent.ValidateScriptScope())
-                        {
-                            local scope = ent.GetScriptScope()
-                            if ("Controller" in scope)
-                            {
-                                scope.Controller.GoToPathCustom(Vector(4, 3597, 8))
-                            }
-                        }
-                    }
-                    
-                    break;
-                }
                 case "STATEOFEMERGENCY":
                 {
                     ChaosMode(1, 0);
