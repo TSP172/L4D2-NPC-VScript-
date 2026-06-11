@@ -1,0 +1,7 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/blop4dead/npc_bananabomb"
+	"$bumpmap" "models/blop4dead/npc_bananabomb_n"
+	"$envmap"            "env_cubemap"
+	"$envmaptint"	"[.5 .5 .5]"
+}

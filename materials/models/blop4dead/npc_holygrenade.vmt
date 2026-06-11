@@ -1,0 +1,6 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/blop4dead/npc_holygrenade"
+	"$envmap"            "env_cubemap"
+	"$envmaptint"	"[.5 .5 .5]"
+}
