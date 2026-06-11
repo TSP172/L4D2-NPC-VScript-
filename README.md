@@ -1,3 +1,10 @@
+# Version 1.2 Update
+
+- Added New Weapons for Projectile Class: Grenade, Holy Hand Grenade, Banana Bomb
+- New Sounds added for said weapons
+- Added weapon models and updated character models
+- Added model materials too.
+
 # Version 1.1 Update
 
 - Added "Aim Move" feature: this makes both Armed and Projectile NPCs move while they aiming at enemies. by default "canMoveDuringAim" is set to 0, you must set to 1 to make NPCs move while aiming before spawning.
