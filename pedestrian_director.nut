@@ -288,8 +288,9 @@ function SpawnFromPopulation(_vectorOrigin)
 
     if(npcData[12] == -1)
     {
+
         if (npcData[0] == 2) { weaponChoice = RandomInt(1, 4); }
-        else if (npcData[0] == 3) { weaponChoice = RandomInt(5, 7); }
+        else if (npcData[0] == 3) { while (weaponChoice == 8) {weaponChoice = RandomInt(5, 11)};} //prevent projectile npcs from spawning with mini nuke launcher if choosen random.
         else if (npcData[0] == 4) { weaponChoice = 8; }
         else if (npcData[0] == 5) { weaponChoice = RandomInt(0, 10); }
     }

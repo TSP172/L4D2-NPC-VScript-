@@ -2156,7 +2156,7 @@ class ::Pedestrian
 class ::PedArmed extends Pedestrian //uses weaponfire based weapons like pistol, shotgun etc.
 {
     npcClassNumber = 2;
-    npcWeapon = null; //WEAPON TYPES: 0 = Nothing, 1 = Pistol, 2 = Shotgun, 3 = Rifle, 4 = Sniper Rifle, 5 = Grenade Launcher, 6 = Molotov, 7 = Mini-nuke launcher.
+    npcWeapon = null; //WEAPON TYPES: 0 = Nothing, 1 = Pistol, 2 = Shotgun, 3 = Rifle, 4 = Sniper Rifle, 5 = Grenade Launcher, 6 = Molotov, 7 = rocket launcher, 8 = Mini-nuke launcher, 9 = grenade, 10 = holy hand grenade, 11 = banana bomb
     npcWeaponModel = null;
     npcWeaponName = null;
     npcWeaponFireEntity = null; //if npc has pistol, shotgun, riffle or sniper riffle we gonna use this and assign env_weaponfire to it.
@@ -2217,6 +2217,18 @@ class ::PedArmed extends Pedestrian //uses weaponfire based weapons like pistol,
             case 8: //MINI NUKE LAUNCHER !!DONT CALL THIS IN PedArmed CLASS!!
             {
                 wfType = 2; wfDamageMod = 1.0; wpSkin = 1; wpModel = "models/blop4dead/npc_rocketlauncher.mdl"; break;
+            }
+            case 9: //Grenade !!DONT CALL THIS IN PedArmed CLASS!!
+            {
+                wfType = 2; wfDamageMod = 1.0; wpModel = "models/blop4dead/npc_grenade.mdl"; break;
+            }
+            case 10: //Holy Hand Grenade !!DONT CALL THIS IN PedArmed CLASS!!
+            {
+                wfType = 2; wfDamageMod = 1.0; wpModel = "models/blop4dead/npc_holygrenade.mdl"; break;
+            }
+            case 11: //Banana Bomb !!DONT CALL THIS IN PedArmed CLASS!!
+            {
+                wfType = 2; wfDamageMod = 1.0; wpModel = "models/blop4dead/npc_bananabomb.mdl"; break;
             }
         }
 
@@ -2287,7 +2299,7 @@ class ::PedArmed extends Pedestrian //uses weaponfire based weapons like pistol,
         }
     }
 
-    function AimMove(direction, _moveDist = 5, _checkDistance = 20)
+    function AimMove(direction, _moveDist = 2, _checkDistance = 20) //move dist formerly 5.
     {
         if (this.npcMyCurrentEnemy == null) return false;
 
@@ -2308,6 +2320,9 @@ class ::PedArmed extends Pedestrian //uses weaponfire based weapons like pistol,
             case 6: anim = "molotovaim_move"; break;
             case 7: anim = "rocketlauncheraim_move"; break;
             case 8: anim = "rocketlauncheraim_move"; break;
+            case 9: anim = "grenadeaim_move"; break;
+            case 10: anim = "grenadeaim_move"; break;
+            case 11: anim = "bananabombaim_move"; break;
         }
 
         switch(direction)
@@ -2433,6 +2448,9 @@ class ::PedArmed extends Pedestrian //uses weaponfire based weapons like pistol,
                 case 6: SetAnimation("molotovaim", 3.0); break;
                 case 7: SetAnimation("rocketlauncheraim", 3.0); break;
                 case 8: SetAnimation("rocketlauncheraim", 3.0); break;
+                case 9: SetAnimation("grenadeaim", 3.0); break;
+                case 10: SetAnimation("grenadeaim", 3.0); break;
+                case 11: SetAnimation("bananabombaim", 3.0); break;
             }
             EmitSoundOn("AutoShotgun.Deploy", this.npcWeaponModel);
         }
@@ -2728,7 +2746,7 @@ class ::PedArmed extends Pedestrian //uses weaponfire based weapons like pistol,
 class ::PedProjectile extends PedArmed //uses Grenade Launcher or Molotov
 {
     npcClassNumber = 3;
-    npcWeapon = null; //WEAPON TYPES: 0 = Nothing, 1 = Pistol, 2 = Shotgun, 3 = Riffle, 4 = Sniper Riffle, 5 = Grenade Launcher, 6 = Molotov, 7 = Rocket Launcher, 8 = mini nuke launcher.
+    npcWeapon = null; //WEAPON TYPES: 0 = Nothing, 1 = Pistol, 2 = Shotgun, 3 = Riffle, 4 = Sniper Riffle, 5 = Grenade Launcher, 6 = Molotov, 7 = Rocket Launcher, 8 = mini nuke launcher. 9 = grenade, 10 = holy hand grenade, 11 = banana bomb
     npcProjectileSpawnEntity = null; //if npc has grenade launcher or molotov we gonna use this and assign an info_target to it.
     npcNextProjectileSpawnTime = 4.0;
 
@@ -2738,9 +2756,13 @@ class ::PedProjectile extends PedArmed //uses Grenade Launcher or Molotov
         base.constructor(npcorigin, thehealth, themodel, gender, voiceSet, type, affiliation, aggression, canTaunt, bodyGroup, bodySkin, range, weapon, canMoveDuringAim);
         this.npcProjectileSpawnEntity = SpawnEntityFromTable("info_target", {});
         DoEntFire("!self", "SetParent", this.npcModel.GetName(), 0, null, this.npcWeaponModel);
-        DoEntFire("!self", "SetParent", this.npcWeaponName, 0, null, this.npcProjectileSpawnEntity);
         DoEntFire("!self", "SetParentAttachment", "weapon_bone", 0.05, null, this.npcWeaponModel);
-        DoEntFire("!self", "SetParentAttachment", "fire", 0.05, null, this.npcProjectileSpawnEntity);
+        if(weapon != 9 && weapon != 10 && weapon != 11)
+        {
+            DoEntFire("!self", "SetParent", this.npcWeaponName, 0, null, this.npcProjectileSpawnEntity);
+            DoEntFire("!self", "SetParentAttachment", "fire", 0.05, null, this.npcProjectileSpawnEntity);
+        }
+        
     }
 
     function Die()
@@ -2819,7 +2841,7 @@ class ::PedProjectile extends PedArmed //uses Grenade Launcher or Molotov
         {
             if(traceTable.hit)
             {
-                if(this.npcWeapon == 5 || this.npcWeapon == 6)
+                if(this.npcWeapon == 5 || this.npcWeapon == 6) //is grenade launcher or molotov?
                 {
                     local newProjectile = NPCProjectile(this.npcWeapon, "projectile_" + this.npcName, this.npcProjectileSpawnEntity.GetOrigin(), target, this.npcModel, this.npcAffiliation);
                     local ent = newProjectile.projectileEntity; 
@@ -2833,9 +2855,37 @@ class ::PedProjectile extends PedArmed //uses Grenade Launcher or Molotov
                     };
                     AddThinkToEnt(ent, "Think");
                 }
-                else if (this.npcWeapon == 7 || this.npcWeapon == 8)
+                else if (this.npcWeapon == 7 || this.npcWeapon == 8) //is rocket launcher or mini nuke launcher?
                 {
                     local newProjectile = NPCProjectileRocket(this.npcWeapon, "projectile_" + this.npcName, this.npcProjectileSpawnEntity.GetOrigin(), this.npcMyCurrentEnemy, this.npcModel, this.npcAffiliation, this.npcModel.GetAngles(), 38);
+                    local ent = newProjectile.projectileEntity; 
+                    
+                    BindNPCToEntity(ent, newProjectile);
+                    ent.ValidateScriptScope();
+                    local scope = ent.GetScriptScope();
+                    
+                    scope.Think <- function() {
+                        return Controller.ProjectileThink();
+                    };
+                    AddThinkToEnt(ent, "Think");
+                }
+                else if (this.npcWeapon == 9 || this.npcWeapon == 10) //is grenade or holy hand grenade?
+                {
+                    local newProjectile = NPCProjectileGrenade(this.npcWeapon, "projectile_" + this.npcName, this.npcProjectileSpawnEntity.GetOrigin(), target, this.npcModel, this.npcAffiliation, this.npcModel.GetAngles(), 1, 1500.0);
+                    local ent = newProjectile.projectileEntity; 
+                    
+                    BindNPCToEntity(ent, newProjectile);
+                    ent.ValidateScriptScope();
+                    local scope = ent.GetScriptScope();
+                    
+                    scope.Think <- function() {
+                        return Controller.ProjectileThink();
+                    };
+                    AddThinkToEnt(ent, "Think");
+                }
+                else if (this.npcWeapon == 11) //is banana bomb?
+                {
+                    local newProjectile = NPCProjectileGrenade(this.npcWeapon, "projectile_" + this.npcName, this.npcProjectileSpawnEntity.GetOrigin(), target, this.npcModel, this.npcAffiliation, this.npcModel.GetAngles(), 15, 3000.0);
                     local ent = newProjectile.projectileEntity; 
                     
                     BindNPCToEntity(ent, newProjectile);
@@ -2874,6 +2924,24 @@ class ::PedProjectile extends PedArmed //uses Grenade Launcher or Molotov
             {
                 SetAnimation("rocketlaunchershoot", 1.0);
                 EmitAmbientSoundOn("sfx/weapons/mininukelaunchershoot.mp3", 10, 95, 100, this.npcWeaponModel);	
+                break;
+            }
+            case 9: //Grenade
+            {
+                SetAnimation("grenadeshoot", 1.0);
+                EmitAmbientSoundOn("sfx/weapons/grenade_pin.mp3", 10, 85, 100, this.npcWeaponModel);
+                break;
+            }
+            case 10: //Holy Hand Grenade
+            {
+                SetAnimation("grenadeshoot", 1.0);
+                EmitAmbientSoundOn("sfx/weapons/holygrenade_pin.mp3", 10, 85, 100, this.npcWeaponModel);
+                break;
+            }
+            case 11: //BANANA BOMB
+            {
+                SetAnimation("bananabombshoot", 1.0);
+                EmitAmbientSoundOn("sfx/weapons/bananabomb_throw.mp3", 10, 85, 100, this.npcWeaponModel);
                 break;
             }
         }
@@ -4027,6 +4095,24 @@ class ::NPCProjectile
                 DoEntFire("!self", "ignite", "", 0, this.projectileEntity, this.projectileEntity);
                 break;
             }
+            case 9: //grenade //DO NOT CALL THIS IN THIS CLASS
+            {
+                this.projectileEntity = SpawnEntityFromTable("prop_physics_multiplayer", {targetname = this.projectileName, model = "models/blop4dead/npc_grenade_phys.mdl", origin = pOrigin});
+                NetProps.SetPropEntity(this.projectileEntity, "m_hOwnerEntity", pOwner);
+                break;
+            }
+            case 10: //holy hand grenade //DO NOT CALL THIS IN THIS CLASS
+            {
+                this.projectileEntity = SpawnEntityFromTable("prop_physics_multiplayer", {targetname = this.projectileName, model = "models/blop4dead/npc_holygrenade_phys.mdl", origin = pOrigin});
+                NetProps.SetPropEntity(this.projectileEntity, "m_hOwnerEntity", pOwner);
+                break;
+            }
+            case 11: //banana bomb //DO NOT CALL THIS IN THIS CLASS
+            {
+                this.projectileEntity = SpawnEntityFromTable("prop_physics_multiplayer", {targetname = this.projectileName, model = "models/blop4dead/npc_bananabomb_phys.mdl", origin = pOrigin});
+                NetProps.SetPropEntity(this.projectileEntity, "m_hOwnerEntity", pOwner);
+                break;
+            }
         }
         
         if (this.projectileEntity)
@@ -4078,10 +4164,28 @@ class ::NPCProjectile
                 return 10;
                 break;
             }
+            case 9: //Grenade
+            {
+                TriggerGrenadeExplosion(this.projectileEntity.GetOrigin(), 400, 450, this.projectileTeam);
+                return 10;
+                break;
+            }
+            case 10: //Holy Grenade (a bit stronger than regular grenade)
+            {
+                TriggerGrenadeExplosion(this.projectileEntity.GetOrigin(), 600, 550, this.projectileTeam);
+                return 10;
+                break;
+            }
+            case 11: //Banana Bomb (strong than previous grenades)
+            {
+                TriggerNuclearExplosion(this.projectileEntity.GetOrigin(), 1000, 700, this.projectileTeam, "missile_hit1", 1)
+                return 10;
+                break;
+            }
         }
     }
 
-    function TriggerNuclearExplosion(iorigin, rad, damage, team, particle)
+    function TriggerNuclearExplosion(iorigin, rad, damage, team, particle, sound = 0)
     {
         local explodeEffectEnt = SpawnEntityFromTable("info_particle_system", {
         targetname = this.projectileName + "_effect",
@@ -4141,11 +4245,27 @@ class ::NPCProjectile
             }
         }
 
+        local soundToPlay = "sfx/explosions/megaexplosion01.mp3";
+        switch(sound)
+        {
+            case 1:
+            {
+                soundToPlay = "sfx/weapons/bananabomb_explode.mp3";
+                break;
+            }
+            default:
+            {
+                soundToPlay = "sfx/explosions/megaexplosion01.mp3";
+                break;
+            }
+        }
+
         //clean this fucker
         DoEntFire("!self", "Start", "", 0.01, explodeEffectEnt, explodeEffectEnt);
         DoEntFire("!self", "Kill", "", 15.0, explodeEffectEnt, explodeEffectEnt);
-        EmitAmbientSoundOn("sfx/explosions/megaexplosion01.mp3", 10, 0, 100, explodeEffectEnt);
+        EmitAmbientSoundOn(soundToPlay, 10, 95, 100, explodeEffectEnt);
 
+        /*
         local player = null;
         while (player = Entities.FindByClassname(player, "player")) {
             if (player.IsValid()) {
@@ -4153,6 +4273,7 @@ class ::NPCProjectile
                 ScreenFade(player, 255, 255, 255, 255, 2, 0.1, 1);
             }
         }   
+        */
         
         if (this.projectileEntity && this.projectileEntity.IsValid())
             BroadcastNPCExplosion(iorigin, rad);
@@ -4294,6 +4415,80 @@ class ::NPCProjectileRocket extends NPCProjectile
         }
 
         this.projectileEntity.SetOrigin(nextPos);
+
+        this.projectileLifeTime -= 0.03;
+        if (this.projectileLifeTime <= 0) {
+            TriggerProjectile();
+            return 10;
+        }
+
+        return 0.03;
+    }
+}
+
+class ::NPCProjectileGrenade extends NPCProjectile
+{
+    projectileSpeed = 20;
+    projectileLifeTime = 5.0;
+    projectileBouncePower = 2500;
+
+    constructor(pType, pName, pOrigin, pTarget, pOwner, pTeam, pAngles, pSpeed, pBouncePower)
+    {
+        base.constructor(pType, pName, pOrigin, pTarget, pOwner, pTeam)
+        this.projectileSpeed = pSpeed;
+        this.projectileBouncePower = pBouncePower;
+        this.projectileLifeTime = 5.0;
+        this.projectileEntity.SetAngles(pAngles);
+        //this.projectileForward = pAngles.Forward();
+
+        if (this.projectileEntity)
+        {
+            local spawnPos = pOwner.GetOrigin() + (pOwner.GetForwardVector() * 32) + Vector(0, 0, 50);
+            
+            this.projectileEntity.SetOrigin(spawnPos);
+
+            NetProps.SetPropEntity(this.projectileEntity, "m_hOwnerEntity", pOwner);
+
+            local aimDir = pTarget.GetOrigin() - spawnPos;
+            aimDir.Norm();
+            
+            local launchVec = (aimDir * 900) + Vector(0, 0, 200); // Forward + Upward arc
+            this.projectileEntity.ApplyAbsVelocityImpulse(launchVec);
+        }
+    }
+
+    function Bounce()
+    {
+        local pVel = this.projectileEntity.GetVelocity();
+        this.projectileEntity.ApplyAbsVelocityImpulse(Vector(this.projectileBouncePower * RandomFloat(-1, 1), this.projectileBouncePower * RandomFloat(-1, 1), this.projectileBouncePower));
+
+        if(this.projectileEntity.GetModelName() == "models/blop4dead/npc_bananabomb_phys.mdl")
+        {
+            EmitAmbientSoundOn("sfx/weapons/bananabomb_throw.mp3", 10, 95, 100, this.projectileEntity); //make cartoonish bounce sound for banana bomb.
+        }
+    }
+
+    function ProjectileThink()
+    {   
+        if (!this.projectileEntity || !this.projectileEntity.IsValid()) return null;
+
+        
+        local currentPos = this.projectileEntity.GetOrigin();
+
+        local traceTable = {
+            start = currentPos + Vector(0, 0, 25), // Start a bit above the current position to prevent immediate ground collision
+            end = currentPos + Vector(0, 0, -5), // Trace downward to check for ground
+            mask = DirectorScript.TRACE_MASK_SHOT,
+            ignore = this.projectileEntity
+        };
+
+        TraceLine(traceTable);
+
+        if (traceTable.hit)
+        {
+            //DebugDrawLine(traceTable.start, traceTable.end, 255, 0, 0, true, 1.0);
+            Bounce();
+        }
 
         this.projectileLifeTime -= 0.03;
         if (this.projectileLifeTime <= 0) {

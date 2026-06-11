@@ -173,12 +173,19 @@ PrecacheModel("models/blop4dead/npc_sword.mdl");
 PrecacheModel("models/blop4dead/npc_knife.mdl");
 PrecacheModel("models/blop4dead/npc_baseballbat.mdl");
 PrecacheModel("models/blop4dead/npc_axe.mdl");
+PrecacheModel("models/blop4dead/npc_grenade.mdl"); PrecacheModel("models/blop4dead/npc_grenade_phys.mdl");
+PrecacheModel("models/blop4dead/npc_holygrenade.mdl"); PrecacheModel("models/blop4dead/npc_holygrenade_phys.mdl");
+PrecacheModel("models/blop4dead/npc_bananabomb.mdl"); PrecacheModel("models/blop4dead/npc_bananabomb_phys.mdl");
 PrecacheModel("models/blop4dead/npc_drink.mdl");
 PrecacheModel("models/blop4dead/npc_cigar.mdl");
 PrecacheModel("models/blop4dead/npc_phone.mdl");
 PrecacheSound("cutscene/rpgshoot01.mp3");
 PrecacheSound("sfx/weapons/mininukelaunchershoot.mp3");
 PrecacheSound("sfx/explosions/megaexplosion01.mp3");
+PrecacheSound("sfx/weapons/bananabomb_explode.mp3");
+PrecacheSound("sfx/weapons/grenade_pin.mp3");
+PrecacheSound("sfx/weapons/holygrenade_pin.mp3");
+PrecacheSound("sfx/weapons/bananabomb_throw.mp3");
 
 for (local i = 0; i < maleModels.len(); i++) 
 {

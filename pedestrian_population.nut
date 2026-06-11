@@ -13,7 +13,7 @@ totalBody: the bodygroup set to use for the NPC, this is used to determine the c
 skin: the skin to use for the NPC, if set to -1 it will be random.
 npcRange: the range for the NPC to detect survivors and infected.
 npcWeapon: the weapon for the NPC to use, if set to -1 it will be random based on the npcClass, doesn't work on unarmed npcs.
-WEAPON CHOICES: 1 = PISTOL, 2 = RIFLE, 3 = SHOTGUN, 4 = SNIPER RIFLE, 5 = GRENADE LAUNCHER, 6 = MOLOTOV, 7 = ROCKET LAUNCHER, 8 = MINI NUKE LAUNCHER
+WEAPON CHOICES: 1 = PISTOL, 2 = RIFLE, 3 = SHOTGUN, 4 = SNIPER RIFLE, 5 = GRENADE LAUNCHER, 6 = MOLOTOV, 7 = ROCKET LAUNCHER, 8 = MINI NUKE LAUNCHER, 9 = GRENADE, 10 = HOLY HAND GRENADE, 11 = BANANA BOMB.
 MELEE CHOICES: 0 = FISTS, 1 = BASEBALLBAT, 2 = SWORD, 3 = KATANA, 4 = SHOVEL, 5 = PAN, 6 = SLEDGEHAMMER, 7 = BATON, 8 = AXE, 9 = KNIFE, 10 = SIGN
 damageMultiplier: multiplies the damage of melee
 npcCanMoveDuringAim: 0 = can't move during aiming, 1 = can move during aim (only applies to armed and projectile npcs)
@@ -31,7 +31,8 @@ DEFAULT_POPULATION <- //Default Population (if the map doesn't match any of the 
     [5, 85, 2, 0, 2, 0, 1, 0.6, 1, -2, -1, 750, -1, 1.5], //melee npc with random melee (penguin 2)
     [2, 150, 1, 0, 0, 0, 1, 0.6, 1, -1, -1, 1500, -1, 1, 1], //armed npc with random weapon (penguin 1)
     [2, 150, 2, 0, 0, 0, 1, 0.6, 1, -2, -1, 1500, -1, 1, 1], //armed npc with random weapon (penguin 2)
-    [3, 150, 2, 0, 0, 0, 1, 0.8, 1, -2, -1, 1500, -1, 1, 1] //armed npc with random projectile weapon (penguin 2)
+    [3, 150, 2, 0, 0, 0, 1, 0.8, 1, -2, -1, 1500, -1, 1, 1], //armed npc with random projectile weapon (penguin 2)
+    [3, 150, 2, 0, 0, 0, 1, 0.8, 1, -2, -1, 1500, 11, 1, 1] //armed npc with banan bomb as projectile weapon (penguin 2)
 ]
 
 TSP_NPCTEST_POPULATION <- DEFAULT_POPULATION //tsp_npctest population (test map for npcs). just same as default population
